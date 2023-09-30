@@ -1,0 +1,37 @@
+spring:
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+
+  datasource:
+    url: jdbc:h2:mem:security
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    driver-class-name: org.h2.Driver
+    properties:
+      hibernate:
+        format_sql: false
+        show_sql: false
+
+  thymeleaf:
+    cache: false
+
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+
+  main:
+    allow-bean-definition-overriding: true
+
+logging:
+  level:
+    org.hibernate.SQL: debug
