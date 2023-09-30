@@ -67,7 +67,11 @@ public class SecurityConfig {
                 .requestMatchers(new MvcRequestMatcher(introSpector, "/config")).hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
-                .formLogin().permitAll();
+                .formLogin()
+                .loginPage("/login")
+                .loginProcessingUrl("/login_proc")
+                .defaultSuccessUrl("/")
+                .permitAll();
 
         return http.build();
     }
