@@ -73,7 +73,7 @@ public class SecurityConfig {
                 .exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler())
                 .and()
-                .addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests()
                 .requestMatchers(new AntPathRequestMatcher("/login/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/login*")).permitAll()
@@ -101,5 +101,13 @@ public class SecurityConfig {
         accessDeniedHandler.setErrorPage("/denied");
         return accessDeniedHandler;
     }
-    
+
+
+//    @Bean
+//    public AjaxLoginProcessingFilter ajaxLoginProcessingFilter() throws Exception {
+//        AjaxLoginProcessingFilter ajaxLoginProcessingFilter = new AjaxLoginProcessingFilter();
+//        ajaxLoginProcessingFilter.setAuthenticationManager();
+//        return ajaxLoginProcessingFilter;
+//    }
+
 }
