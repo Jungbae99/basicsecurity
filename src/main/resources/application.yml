@@ -13,7 +13,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     driver-class-name: org.h2.Driver
     properties:
       hibernate:
