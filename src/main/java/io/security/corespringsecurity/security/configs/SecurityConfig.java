@@ -1,5 +1,6 @@
 package io.security.corespringsecurity.security.configs;
 
+import io.security.corespringsecurity.security.filter.AjaxLoginProcessingFilter;
 import io.security.corespringsecurity.security.handler.CustomAccessDeniedHandler;
 import io.security.corespringsecurity.security.provider.CustomAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,6 +25,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
@@ -30,7 +34,6 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
 
     private final UserDetailsService userDetailsService;
     private final AuthenticationDetailsSource authenticationDetailsSource;
@@ -45,7 +48,6 @@ public class SecurityConfig {
     public AuthenticationProvider authenticationProvider() {
         return new CustomAuthenticationProvider(userDetailsService, passwordEncoder());
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -71,6 +73,7 @@ public class SecurityConfig {
                 .exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler())
                 .and()
+                .addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests()
                 .requestMatchers(new AntPathRequestMatcher("/login/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/login*")).permitAll()
@@ -98,5 +101,5 @@ public class SecurityConfig {
         accessDeniedHandler.setErrorPage("/denied");
         return accessDeniedHandler;
     }
-
+    
 }
