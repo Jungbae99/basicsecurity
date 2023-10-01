@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
@@ -30,6 +31,7 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final AuthenticationDetailsSource authenticationDetailsSource;
+    private final AuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(authenticationProvider());
@@ -54,6 +56,7 @@ public class SecurityConfig {
                 .requestMatchers(new AntPathRequestMatcher("/css/**"))
                 .requestMatchers(new AntPathRequestMatcher("/js/**"))
                 .requestMatchers(new AntPathRequestMatcher("/img/**"))
+                .requestMatchers(new AntPathRequestMatcher("/error/**"))
                 .requestMatchers(new AntPathRequestMatcher("/lib/**"));
     }
 
@@ -62,8 +65,9 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests()
+                .requestMatchers(new AntPathRequestMatcher("/login/**")).permitAll()
                 .requestMatchers(new MvcRequestMatcher(introSpector, "/")).permitAll()
-                .requestMatchers(new MvcRequestMatcher(introSpector, "users")).permitAll()
+                .requestMatchers(new MvcRequestMatcher(introSpector, "/users")).permitAll()
                 .requestMatchers(new MvcRequestMatcher(introSpector, "/myPage")).hasRole("USER")
                 .requestMatchers(new MvcRequestMatcher(introSpector, "/messages")).hasRole("MANAGER")
                 .requestMatchers(new MvcRequestMatcher(introSpector, "/config")).hasRole("ADMIN")
@@ -73,7 +77,8 @@ public class SecurityConfig {
                 .loginPage("/login")
                 .loginProcessingUrl("/login_proc")
                 .authenticationDetailsSource(authenticationDetailsSource)
-                .defaultSuccessUrl("/")
+                .defaultSuccessUrl("/", true)
+                .successHandler(customAuthenticationSuccessHandler)
                 .permitAll();
 
         return http.build();
