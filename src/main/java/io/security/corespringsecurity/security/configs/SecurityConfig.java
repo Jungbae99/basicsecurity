@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -32,6 +33,7 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final AuthenticationDetailsSource authenticationDetailsSource;
     private final AuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    private final AuthenticationFailureHandler customAuthenticationFailureHandler;
 
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(authenticationProvider());
@@ -66,6 +68,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests()
                 .requestMatchers(new AntPathRequestMatcher("/login/**")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/login*")).permitAll()
                 .requestMatchers(new MvcRequestMatcher(introSpector, "/")).permitAll()
                 .requestMatchers(new MvcRequestMatcher(introSpector, "/users")).permitAll()
                 .requestMatchers(new MvcRequestMatcher(introSpector, "/myPage")).hasRole("USER")
@@ -77,8 +80,8 @@ public class SecurityConfig {
                 .loginPage("/login")
                 .loginProcessingUrl("/login_proc")
                 .authenticationDetailsSource(authenticationDetailsSource)
-                .defaultSuccessUrl("/", true)
                 .successHandler(customAuthenticationSuccessHandler)
+                .failureHandler(customAuthenticationFailureHandler)
                 .permitAll();
 
         return http.build();

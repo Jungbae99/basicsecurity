@@ -31,7 +31,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         // 이곳에서 Password 검증
         if (!passwordEncoder.matches(password, accountContext.getAccount().getPassword())) {
-            throw new BadCredentialsException("패스워드가 일치하지 않습니다.");
+            throw new BadCredentialsException("Password does not match");
         }
 
         FormWebAuthenticationDetails formWebAuthenticationDetails = (FormWebAuthenticationDetails) authentication.getDetails();
@@ -39,7 +39,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String secretKey = formWebAuthenticationDetails.getSecretKey();
 
         if (secretKey == null || !"secret".equals(secretKey)) {
-            throw new InsufficientAuthenticationException("불충분한 인증");
+            throw new InsufficientAuthenticationException("InsufficientAuthenticationException");
         }
         return new UsernamePasswordAuthenticationToken(accountContext.getAccount(), null, accountContext.getAuthorities());
 
