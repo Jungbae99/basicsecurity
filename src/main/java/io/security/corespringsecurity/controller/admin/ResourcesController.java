@@ -4,6 +4,7 @@ import io.security.corespringsecurity.domain.dto.ResourcesDto;
 import io.security.corespringsecurity.domain.entity.Resources;
 import io.security.corespringsecurity.domain.entity.Role;
 import io.security.corespringsecurity.repository.RoleRepository;
+import io.security.corespringsecurity.security.metadatasource.UrlSecurityMetadataSource;
 import io.security.corespringsecurity.security.service.ResourcesService;
 import io.security.corespringsecurity.security.service.RoleService;
 import org.modelmapper.ModelMapper;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 @Controller
 public class ResourcesController {
 
@@ -29,6 +29,9 @@ public class ResourcesController {
 
     @Autowired
     private RoleService roleService;
+
+    @Autowired
+    private UrlSecurityMetadataSource urlSecurityMetadataSource;
 
     @GetMapping(value="/admin/resources")
     public String getResources(Model model) throws Exception {
@@ -50,6 +53,7 @@ public class ResourcesController {
         resources.setRoleSet(roles);
 
         resourcesService.createResources(resources);
+        urlSecurityMetadataSource.reload();
 
         return "redirect:/admin/resources";
     }
@@ -63,7 +67,7 @@ public class ResourcesController {
         ResourcesDto resources = new ResourcesDto();
         Set<Role> roleSet = new HashSet<>();
         roleSet.add(new Role());
-//        resources.setRoleSet(roleSet);
+        resources.setRoleSet(roleSet);
         model.addAttribute("resources", resources);
 
         return "admin/resource/detail";
@@ -88,6 +92,7 @@ public class ResourcesController {
 
         Resources resources = resourcesService.getResources(Long.valueOf(id));
         resourcesService.deleteResources(Long.valueOf(id));
+        urlSecurityMetadataSource.reload();
 
         return "redirect:/admin/resources";
     }
