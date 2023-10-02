@@ -1,10 +1,15 @@
 package io.security.corespringsecurity.security.configs;
 
+import io.security.corespringsecurity.security.factory.UrlResourcesMapFactoryBean;
 import io.security.corespringsecurity.security.filter.AjaxLoginProcessingFilter;
 import io.security.corespringsecurity.security.handler.CustomAccessDeniedHandler;
+import io.security.corespringsecurity.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
 import io.security.corespringsecurity.security.provider.CustomAuthenticationProvider;
+import io.security.corespringsecurity.security.service.SecurityResourceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.security.reactive.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,6 +43,7 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Configuration
 @EnableWebSecurity
@@ -48,6 +54,7 @@ public class SecurityConfig {
     private final AuthenticationDetailsSource authenticationDetailsSource;
     private final AuthenticationSuccessHandler customAuthenticationSuccessHandler;
     private final AuthenticationFailureHandler customAuthenticationFailureHandler;
+    private final SecurityResourceService securityResourceService;
 
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(authenticationProvider());
@@ -139,9 +146,15 @@ public class SecurityConfig {
         return Arrays.asList(new RoleVoter());
     }
 
-//    @Bean
-//    public FilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource() {
-//        return new UrlFilterInvocationSecurityMetadatsSource();
-//    }
+    @Bean
+    public FilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource() throws Exception {
+        return new UrlFilterInvocationSecurityMetadataSource(urlResourcesMapFactoryBean().getObject());
+    }
+
+    private UrlResourcesMapFactoryBean urlResourcesMapFactoryBean() {
+        UrlResourcesMapFactoryBean urlResourcesMapFactoryBean = new UrlResourcesMapFactoryBean();
+        urlResourcesMapFactoryBean.setSecurityResourceService(securityResourceService);
+        return urlResourcesMapFactoryBean;
+    }
 
 }
